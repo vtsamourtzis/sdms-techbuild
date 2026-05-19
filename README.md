@@ -1,7 +1,5 @@
 # SDMS — Secure Document Management System
 
-**5CM505 Software Engineering · Student 100777959**
-
 A Node.js web application implementing secure document management for TechBuild Engineering.
 
 ## Setup
