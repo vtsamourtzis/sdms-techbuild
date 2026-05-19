@@ -1,0 +1,48 @@
+<%- include('partials/head') %>
+<%- include('partials/sidebar') %>
+<div class="main">
+  <div class="topbar">
+    <span class="topbar-title">Audit Log</span>
+    <span class="topbar-spacer"></span>
+    <span class="topbar-meta">90-day retention policy</span>
+  </div>
+  <div class="content">
+    <%- include('partials/flash') %>
+    <div class="card" style="padding:0">
+      <div class="card-header">
+        <strong>All audit events</strong>
+        <span style="font-size:.8rem;color:var(--muted)"><%= entries.length %> entries, newest first</span>
+      </div>
+      <% if (entries.length === 0) { %>
+        <div class="empty"><div class="icon">🗂</div><p>No entries yet.</p></div>
+      <% } else { %>
+      <div class="table-wrap" style="border:none;border-radius:0">
+        <table>
+          <thead>
+            <tr><th>Timestamp</th><th>User</th><th>Action</th><th>Document</th><th>Detail</th></tr>
+          </thead>
+          <tbody>
+            <% for (const e of entries) { %>
+            <tr>
+              <td class="mono" style="white-space:nowrap"><%= new Date(e.timestamp).toLocaleString('en-GB') %></td>
+              <td class="mono"><%= e.userID ? e.userID.slice(0,10)+'…' : '—' %></td>
+              <td>
+                <span class="chip <%=
+                  e.actionType === 'LOGIN_SUCCESS' || e.actionType === 'UPLOAD_SUCCESS' || e.actionType === 'UNLOCK' ? 'chip-green' :
+                  e.actionType === 'LOGIN_FAILED'  || e.actionType === 'UPLOAD_BLOCKED' || e.actionType === 'RATE_LIMIT_EXCEEDED' ? 'chip-red' :
+                  e.actionType === 'LOCK' || e.actionType === 'OTP_DISPATCHED' ? 'chip-amber' :
+                  'chip-slate'
+                %>"><%= e.actionType %></span>
+              </td>
+              <td class="mono"><%= e.targetID ? e.targetID.slice(0,10)+'…' : '—' %></td>
+              <td style="font-size:.82rem;color:var(--muted)"><%= e.detail || '—' %></td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+<%- include('partials/foot') %>

@@ -1,0 +1,53 @@
+<%- include('partials/head') %>
+<%- include('partials/sidebar') %>
+<div class="main">
+  <div class="topbar">
+    <span class="topbar-title">Upload Document</span>
+    <span class="topbar-spacer"></span>
+    <a href="/dashboard" class="btn btn-ghost btn-sm">← Back</a>
+  </div>
+  <div class="content" style="max-width:680px">
+    <%- include('partials/flash') %>
+    <div class="card">
+      <div class="card-header"><strong>New Document</strong></div>
+      <div class="card-body">
+        <form method="POST" action="/upload" enctype="multipart/form-data">
+          <div class="field">
+            <label for="title">Document title</label>
+            <input type="text" id="title" name="title" required placeholder="e.g. Cooling System Design Rev 3" />
+          </div>
+          <div class="field">
+            <label for="category">Category</label>
+            <select id="category" name="category" required>
+              <option value="" disabled selected>Choose category…</option>
+              <% for (const cat of categories) { %>
+                <option value="<%= cat.value %>"><%= cat.label %> — default: <%= cat.defaultClassification %></option>
+              <% } %>
+            </select>
+          </div>
+          <div class="field">
+            <label for="classificationLevel">Classification override <span style="color:var(--muted);font-weight:400">(optional)</span></label>
+            <select id="classificationLevel" name="classificationLevel">
+              <option value="">Use category default</option>
+              <option value="public">Public</option>
+              <option value="internal">Internal</option>
+              <option value="confidential">Confidential</option>
+              <option value="restricted">Restricted</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="file">File</label>
+            <input type="file" id="file" name="file" required
+              accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg,.xlsx,.csv" />
+            <p class="field-hint">PDF, Word, plain text, images, Excel, CSV — max 50 MB</p>
+          </div>
+          <div style="display:flex;gap:.6rem;margin-top:.5rem">
+            <button type="submit" class="btn btn-primary">Upload</button>
+            <a href="/dashboard" class="btn btn-ghost">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('partials/foot') %>

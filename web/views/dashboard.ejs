@@ -1,0 +1,138 @@
+<%- include('partials/head') %>
+<%- include('partials/sidebar') %>
+<div class="main">
+  <div class="topbar">
+    <span class="topbar-title">Dashboard</span>
+    <span class="topbar-spacer"></span>
+    <span class="topbar-meta">Signed in as <strong><%= session.role %></strong></span>
+  </div>
+
+  <% if (maintenanceMode) { %>
+  <div class="maint-banner">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <strong>Maintenance mode is active.</strong> Engineers cannot access the system while this is enabled.
+  </div>
+  <% } %>
+
+  <div class="content">
+    <%- include('partials/flash') %>
+
+    <div class="stat-grid">
+      <div class="stat-tile">
+        <div class="label">Total Documents</div>
+        <div class="value teal"><%= documents.length %></div>
+      </div>
+      <div class="stat-tile">
+        <div class="label">Reserved</div>
+        <div class="value"><%= documents.filter(d => docLock.isLocked(d.id)).length %></div>
+      </div>
+      <div class="stat-tile">
+        <div class="label">Available</div>
+        <div class="value"><%= documents.filter(d => !docLock.isLocked(d.id)).length %></div>
+      </div>
+      <div class="stat-tile">
+        <div class="label">Your Role</div>
+        <div class="value" style="font-size:1rem;padding-top:.35rem"><%= session.role.charAt(0).toUpperCase()+session.role.slice(1) %></div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <!-- Document list -->
+      <div>
+        <div class="card">
+          <div class="card-header">
+            <strong>Recent Documents</strong>
+            <div style="display:flex;gap:.5rem">
+              <a href="/search" class="btn btn-ghost btn-sm">Search</a>
+              <% if (role !== 'supervisor') { %><a href="/upload" class="btn btn-primary btn-sm">+ Upload</a><% } %>
+            </div>
+          </div>
+
+          <% if (documents.length === 0) { %>
+            <div class="empty">
+              <div class="icon">📄</div>
+              <p>No documents yet.<br>
+              <% if (role !== 'supervisor') { %><a href="/upload">Upload the first one</a><% } %></p>
+            </div>
+          <% } else { %>
+          <div class="table-wrap" style="border:none;border-radius:0">
+            <table>
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th>Level</th>
+                  <th>Status</th>
+                  <% if (role !== 'supervisor') { %><th></th><% } %>
+                </tr>
+              </thead>
+              <tbody>
+                <% for (const doc of documents) {
+                     const locked  = docLock.isLocked(doc.id);
+                     const info    = docLock.getLockInfo(doc.id);
+                     const isOwner = info && info.lockedByUserID === userID;
+                %>
+                <tr>
+                  <td>
+                    <strong style="display:block"><%= doc.title %></strong>
+                    <span class="mono">v<%= doc.versionNo %> &nbsp;·&nbsp; <%= new Date(doc.createdAt).toLocaleDateString('en-GB') %></span>
+                  </td>
+                  <td><span class="chip chip-teal"><%= doc.category %></span></td>
+                  <td>
+                    <span class="chip <%= doc.classificationLevel==='confidential'?'chip-red':doc.classificationLevel==='restricted'?'chip-amber':'chip-slate' %>">
+                      <%= doc.classificationLevel %>
+                    </span>
+                  </td>
+                  <td>
+                    <% if (locked) { %>
+                      <span class="chip chip-amber">Reserved</span>
+                    <% } else { %>
+                      <span class="chip chip-green">Free</span>
+                    <% } %>
+                  </td>
+                  <% if (role !== 'supervisor') { %>
+                  <td style="text-align:right">
+                    <% if (!locked) { %>
+                      <form method="POST" action="/reserve/<%= doc.id %>" style="display:inline">
+                        <button class="btn btn-ghost btn-sm" type="submit">Reserve</button>
+                      </form>
+                    <% } else if (isOwner) { %>
+                      <form method="POST" action="/release/<%= doc.id %>" style="display:inline">
+                        <button class="btn btn-danger btn-sm" type="submit">Release</button>
+                      </form>
+                    <% } else { %>
+                      <span style="font-size:.78rem;color:var(--muted)">locked</span>
+                    <% } %>
+                  </td>
+                  <% } %>
+                </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <div>
+        <div class="card">
+          <div class="card-header"><strong>Lock Notifications</strong></div>
+          <% if (notifications.length === 0) { %>
+            <div class="empty" style="padding:1.25rem"><p style="font-size:.82rem">No events yet.</p></div>
+          <% } else { %>
+            <ul class="notif-feed">
+              <% for (const n of notifications) { %>
+              <li>
+                <%= n.message %>
+                <span class="ts"><%= new Date(n.at).toLocaleTimeString('en-GB') %></span>
+              </li>
+              <% } %>
+            </ul>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('partials/foot') %>

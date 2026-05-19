@@ -1,0 +1,56 @@
+<%- include('partials/head') %>
+<%- include('partials/sidebar') %>
+<div class="main">
+  <div class="topbar">
+    <span class="topbar-title">Maintenance Window</span>
+    <span class="topbar-spacer"></span>
+    <span class="topbar-meta">Manager / Supervisor only</span>
+  </div>
+  <div class="content" style="max-width:580px">
+    <%- include('partials/flash') %>
+
+    <div class="card">
+      <div class="card-header"><strong>System Status</strong></div>
+      <div class="card-body">
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem;padding:.85rem 1rem;border-radius:6px;background:<%= maintenanceMode ? '#fef3c7' : '#f0fdf4' %>;border:1px solid <%= maintenanceMode ? '#fde68a' : '#bbf7d0' %>">
+          <div style="font-size:1.5rem"><%= maintenanceMode ? '🔧' : '✅' %></div>
+          <div>
+            <strong style="display:block;font-size:.95rem"><%= maintenanceMode ? 'Maintenance mode ON' : 'System operational' %></strong>
+            <span style="font-size:.82rem;color:var(--muted)">
+              <%= maintenanceMode
+                ? 'Engineers are blocked from logging in. Only managers and supervisors have access.'
+                : 'All roles can access the system normally.' %>
+            </span>
+          </div>
+        </div>
+
+        <% if (maintenanceMode) { %>
+          <form method="POST" action="/maintenance/disable">
+            <button type="submit" class="btn btn-primary">Disable Maintenance Mode</button>
+          </form>
+        <% } else { %>
+          <form method="POST" action="/maintenance/enable">
+            <p style="font-size:.85rem;color:var(--muted);margin-bottom:.75rem">
+              Enabling maintenance mode will prevent engineers from logging in. Managers and supervisors retain full access.
+            </p>
+            <button type="submit" class="btn btn-danger">Enable Maintenance Mode</button>
+          </form>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:1rem;font-size:.82rem">
+      <div class="card-body" style="color:var(--muted)">
+        <strong style="color:var(--text)">What maintenance mode does</strong>
+        <ul style="margin:.5rem 0 0 1.1rem;line-height:1.9">
+          <li>Engineers who attempt login are redirected with an error message</li>
+          <li>Existing engineer sessions remain valid until they expire</li>
+          <li>Managers and supervisors are unaffected</li>
+          <li>The toggle is stored in memory and persists for the lifetime of the server process</li>
+          <li>All enable/disable actions are recorded in the audit log</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('partials/foot') %>

@@ -1,0 +1,26 @@
+{
+  "name": "sdms-techbuild",
+  "version": "1.0.0",
+  "description": "Secure Document Management System - 5CM505 Software Engineering",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node web/server.js",
+    "test": "jest --coverage",
+    "test:unit": "jest tests/unit",
+    "test:integration": "jest tests/integration"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverageFrom": ["src/**/*.js"]
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "dependencies": {
+    "connect-flash": "^0.1.1",
+    "ejs": "^5.0.2",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "multer": "^2.1.1"
+  }
+}

@@ -1,0 +1,29 @@
+<%- include('partials/head', { authPage: true }) %>
+<div class="auth-center">
+  <div class="auth-box">
+    <div class="logo-row">
+      <div class="badge-s" style="background:var(--accent);color:#fff;width:32px;height:32px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:.9rem;flex-shrink:0">S</div>
+      <div>
+        <div style="font-weight:700;font-size:1rem">Two-factor check</div>
+        <div style="font-size:.75rem;color:var(--muted)">Step 2 of 2</div>
+      </div>
+    </div>
+    <h1>Enter your code</h1>
+    <p class="sub">A 6-digit code was sent to <strong><%= email %></strong>. It expires in 5 minutes.</p>
+
+    <%- include('partials/flash') %>
+
+    <form method="POST" action="/verify-otp">
+      <div class="field">
+        <label for="otp">One-time passcode</label>
+        <input type="text" id="otp" name="otp" class="otp-input"
+               inputmode="numeric" pattern="[0-9]{6}" maxlength="6"
+               autocomplete="one-time-code" required placeholder="000000" />
+      </div>
+      <button type="submit" class="btn btn-primary btn-full" style="margin-top:.4rem">Verify &amp; Sign In</button>
+    </form>
+
+    <p style="text-align:center;font-size:.82rem;color:var(--muted);margin-top:.75rem"><a href="/login">← Back to login</a></p>
+  </div>
+</div>
+<%- include('partials/foot') %>

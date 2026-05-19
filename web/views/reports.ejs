@@ -1,0 +1,79 @@
+<%- include('partials/head') %>
+<%- include('partials/sidebar') %>
+<div class="main">
+  <div class="topbar">
+    <span class="topbar-title">Activity Reports</span>
+    <span class="topbar-spacer"></span>
+    <span class="topbar-meta">Manager / Supervisor only</span>
+  </div>
+  <div class="content">
+    <%- include('partials/flash') %>
+
+    <div class="card" style="margin-bottom:1rem">
+      <div class="card-body" style="padding:.85rem 1.1rem">
+        <form method="GET" action="/reports" style="display:flex;gap:.75rem;align-items:flex-end;flex-wrap:wrap">
+          <div class="field" style="margin:0">
+            <label>From</label>
+            <input type="date" name="from" value="<%= from %>" style="width:auto" />
+          </div>
+          <div class="field" style="margin:0">
+            <label>To</label>
+            <input type="date" name="to" value="<%= to %>" style="width:auto" />
+          </div>
+          <button type="submit" class="btn btn-primary">Apply range</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="stat-grid" style="margin-bottom:1rem">
+      <div class="stat-tile">
+        <div class="label">Total Events</div>
+        <div class="value teal"><%= report.totalEvents %></div>
+      </div>
+      <% for (const [action, count] of Object.entries(report.summary || {})) { %>
+      <div class="stat-tile">
+        <div class="label"><%= action.replace(/_/g,' ') %></div>
+        <div class="value"><%= count %></div>
+      </div>
+      <% } %>
+    </div>
+
+    <div class="card" style="padding:0">
+      <div class="card-header">
+        <strong>Events — <%= from %> to <%= to %></strong>
+        <span style="font-size:.8rem;color:var(--muted)">Generated at <%= new Date().toLocaleTimeString('en-GB') %></span>
+      </div>
+      <% if (!report.entries || report.entries.length === 0) { %>
+        <div class="empty">
+          <div class="icon">📊</div>
+          <p>No events in this period.</p>
+        </div>
+      <% } else { %>
+      <div class="table-wrap" style="border:none;border-radius:0">
+        <table>
+          <thead>
+            <tr><th>Timestamp</th><th>User</th><th>Action</th><th>Detail</th></tr>
+          </thead>
+          <tbody>
+            <% for (const e of report.entries) { %>
+            <tr>
+              <td class="mono" style="white-space:nowrap"><%= new Date(e.timestamp).toLocaleString('en-GB') %></td>
+              <td class="mono"><%= e.userID ? e.userID.slice(0,10)+'…' : '—' %></td>
+              <td>
+                <span class="chip <%=
+                  e.actionType.includes('SUCCESS') ? 'chip-green' :
+                  e.actionType.includes('FAIL') || e.actionType.includes('BLOCKED') ? 'chip-red' :
+                  e.actionType.includes('LOCK') ? 'chip-amber' : 'chip-slate'
+                %>"><%= e.actionType %></span>
+              </td>
+              <td style="font-size:.82rem;color:var(--muted)"><%= e.detail || '—' %></td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+<%- include('partials/foot') %>

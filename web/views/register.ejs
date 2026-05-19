@@ -1,0 +1,45 @@
+<%- include('partials/head', { authPage: true }) %>
+<div class="auth-center">
+  <div class="auth-box" style="max-width:440px">
+    <div class="logo-row">
+      <div class="badge-s" style="background:var(--accent);color:#fff;width:32px;height:32px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:.9rem;flex-shrink:0">S</div>
+      <div>
+        <div style="font-weight:700;font-size:1rem">Create account</div>
+        <div style="font-size:.75rem;color:var(--muted)">Secure Document Management</div>
+      </div>
+    </div>
+    <h1>Register</h1>
+    <p class="sub">Choose your role carefully — permissions are fixed at registration.</p>
+
+    <%- include('partials/flash') %>
+
+    <form method="POST" action="/register">
+      <div class="field">
+        <label for="email">Work email</label>
+        <input type="email" id="email" name="email" autocomplete="email" required placeholder="you@techbuild.com" />
+      </div>
+      <div class="field">
+        <label for="role">Role</label>
+        <select id="role" name="role" required>
+          <option value="" disabled selected>Select role…</option>
+          <option value="engineer">Engineer — upload, download, search, reserve</option>
+          <option value="manager">Manager — all Engineer rights + reports + audit</option>
+          <option value="supervisor">Supervisor — reports &amp; audit only (read-only)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="password">Password <span style="color:var(--muted);font-weight:400">(min 8 chars)</span></label>
+        <input type="password" id="password" name="password" autocomplete="new-password" required minlength="8" placeholder="••••••••" />
+      </div>
+      <div class="field">
+        <label for="confirmPassword">Confirm password</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" autocomplete="new-password" required placeholder="••••••••" />
+      </div>
+      <button type="submit" class="btn btn-primary btn-full" style="margin-top:.4rem">Create Account</button>
+    </form>
+    <p style="text-align:center;font-size:.82rem;color:var(--muted);margin-top:1.1rem">
+      Already registered? <a href="/login">Sign in</a>
+    </p>
+  </div>
+</div>
+<%- include('partials/foot') %>

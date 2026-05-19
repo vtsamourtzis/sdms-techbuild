@@ -1,0 +1,87 @@
+<%- include('partials/head') %>
+<%- include('partials/sidebar') %>
+<div class="main">
+  <div class="topbar">
+    <span class="topbar-title">Search Documents</span>
+    <span class="topbar-spacer"></span>
+  </div>
+  <div class="content">
+    <%- include('partials/flash') %>
+
+    <form method="GET" action="/search" style="display:flex;gap:.5rem;margin-bottom:1rem">
+      <input name="q" value="<%= q || '' %>" placeholder="Search by title…"
+             style="flex:1;padding:.48rem .75rem;border:1px solid var(--border);border-radius:6px;font-size:.9rem" />
+      <select name="category" style="padding:.48rem .75rem;border:1px solid var(--border);border-radius:6px;font-size:.85rem">
+        <option value="">All categories</option>
+        <% for (const cat of categories) { %>
+          <option value="<%= cat.value %>" <%= selectedCategory === cat.value ? 'selected' : '' %>><%= cat.label %></option>
+        <% } %>
+      </select>
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
+    <div class="card" style="padding:0">
+      <div class="card-header">
+        <strong>Results</strong>
+        <span style="font-size:.8rem;color:var(--muted)"><%= results.length %> document<%= results.length !== 1 ? 's' : '' %> found</span>
+      </div>
+      <% if (results.length === 0) { %>
+        <div class="empty">
+          <div class="icon">🔍</div>
+          <p><%= q ? `No documents match "${q}"` : 'Enter a keyword above to search.' %></p>
+        </div>
+      <% } else { %>
+      <div class="table-wrap" style="border:none;border-radius:0">
+        <table>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Category</th>
+              <th>Classification</th>
+              <th>Status</th>
+              <% if (role !== 'supervisor') { %><th></th><% } %>
+            </tr>
+          </thead>
+          <tbody>
+            <% for (const doc of results) {
+                 const locked  = docLock.isLocked(doc.id);
+                 const info    = docLock.getLockInfo(doc.id);
+                 const isOwner = info && info.lockedByUserID === userID;
+            %>
+            <tr>
+              <td>
+                <strong><%= doc.title %></strong><br>
+                <span class="mono"><%= new Date(doc.createdAt).toLocaleDateString('en-GB') %></span>
+              </td>
+              <td><span class="chip chip-teal"><%= doc.category %></span></td>
+              <td>
+                <span class="chip <%= doc.classificationLevel==='confidential'?'chip-red':doc.classificationLevel==='restricted'?'chip-amber':'chip-slate' %>">
+                  <%= doc.classificationLevel %>
+                </span>
+              </td>
+              <td><span class="chip <%= locked ? 'chip-amber' : 'chip-green' %>"><%= locked ? 'Reserved' : 'Free' %></span></td>
+              <% if (role !== 'supervisor') { %>
+              <td style="text-align:right">
+                <% if (!locked) { %>
+                  <form method="POST" action="/reserve/<%= doc.id %>" style="display:inline">
+                    <button class="btn btn-ghost btn-sm">Reserve</button>
+                  </form>
+                <% } else if (isOwner) { %>
+                  <form method="POST" action="/release/<%= doc.id %>" style="display:inline">
+                    <button class="btn btn-danger btn-sm">Release</button>
+                  </form>
+                <% } else { %>
+                  <span style="font-size:.78rem;color:var(--muted)">locked</span>
+                <% } %>
+              </td>
+              <% } %>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+<%- include('partials/foot') %>
